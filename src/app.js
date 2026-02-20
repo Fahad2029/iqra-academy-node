@@ -10,10 +10,10 @@ const app = express();
 // middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ test route (browser / postman se check ke liye)
-app.get("/", (req, res) => {
-  res.send("Backend API is running ✅");
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK", message: "Backend is running" });
 });
 
 // Morgan logs all incoming requests in dev-friendly format
@@ -28,5 +28,7 @@ app.use((req, res, next) => {
 // ✅ routes
 app.use("/api/enroll", enrollmentRoutes);
 app.use("/api/test", testRoutes);
+
+
 
 export default app;
