@@ -4,16 +4,22 @@ import morgan from "morgan";
 import logger from "./logger.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import testRoutes from "./routes/test.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
+
 
 // middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ test route (browser / postman se check ke liye)
-app.get("/", (req, res) => {
-  res.send("Backend API is running ✅");
+// ✅ routes
+app.use("/api/enroll", enrollmentRoutes);
+app.use("/api/test", testRoutes);
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK", message: "Backend is running" });
 });
 
 // Morgan logs all incoming requests in dev-friendly format
@@ -25,8 +31,26 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ routes
-app.use("/api/enroll", enrollmentRoutes);
-app.use("/api/test", testRoutes);
+// ES Modules require this to get __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log("Directory Name ="+__dirname)
+console.log("File Name ="+__filename)
+
+// ✅ Correct React build path (backend ke bahar)
+const frontendBuildPath = "C:/Users/Fahad Javed/Desktop/iqra-quran-academy/frontend/iqra-quran-academy-react/dist";
+
+console.log("Front end build path ="+frontendBuildPath)
+
+// Serve React build
+app.use(express.static(frontendBuildPath));
+
+// Express 5 SPA wildcard fix
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(frontendBuildPath, "index.html"));
+});
+
+
+
 
 export default app;
