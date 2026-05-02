@@ -6,9 +6,9 @@ import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import testRoutes from "./routes/test.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const app = express();
-
 
 // middlewares
 app.use(cors());
@@ -34,23 +34,22 @@ app.use((req, res, next) => {
 // ES Modules require this to get __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log("Directory Name ="+__dirname)
-console.log("File Name ="+__filename)
 
-// ✅ Correct React build path (backend ke bahar)
-const frontendBuildPath = "C:/Users/Fahad Javed/Desktop/iqra-quran-academy/frontend/iqra-quran-academy-react/dist";
+// ✅ Direct correct path (tumhare folder ke hisaab se)
+const frontendBuildPath = path.join(__dirname, "../../iqra-academy-react/dist");
 
-console.log("Front end build path ="+frontendBuildPath)
+console.log("Frontend Path:", frontendBuildPath);
+console.log(
+  "Index exists:",
+  fs.existsSync(path.join(frontendBuildPath, "index.html")),
+);
 
-// Serve React build
+// ✅ Serve static files
 app.use(express.static(frontendBuildPath));
 
-// Express 5 SPA wildcard fix
-app.get(/.*/, (req, res) => {
+// ✅ SPA fallback
+app.use((req, res) => {
   res.sendFile(path.join(frontendBuildPath, "index.html"));
 });
-
-
-
-
+// console.log(import.meta.env.BACKEND_URL);
 export default app;
